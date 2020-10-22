@@ -5,6 +5,8 @@ import ReactDOM from 'react-dom'
 import { SWRConfig } from 'swr'
 import React from 'react'
 
+import { Menu } from 'antd'
+
 import 'antd/dist/antd.css'
 
 import Home from '@/pages/home'
@@ -16,7 +18,17 @@ const App = hot(function() {
       fetcher: request
     }}>
       <Router>
+        <Menu selectedKeys={['home']} mode="horizontal">
+          <Menu.Item key="home">
+            Home
+          </Menu.Item>
+          <Menu.Item key="settings">
+            Settings
+          </Menu.Item>
+        </Menu>
+
         <Route path="/" component={Home} />
+        <Route path="/settings" component={Home} />
       </Router>
     </SWRConfig>
   )
