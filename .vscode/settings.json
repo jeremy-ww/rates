@@ -1,0 +1,7 @@
+{
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "javascript.referencesCodeLens.enabled": true,
+  "prettier.singleQuote": true,
+  "prettier.semi": false,
+  "editor.formatOnSave": true
+}
