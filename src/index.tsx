@@ -2,15 +2,21 @@ import { BrowserRouter as Router, Route } from 'react-router-dom'
 import { hot } from 'react-hot-loader/root'
 import { Workbox } from 'workbox-window'
 import ReactDOM from 'react-dom'
+import { SWRConfig } from 'swr'
 import React from 'react'
 
-import Home from './pages/home'
+import Home from '@/pages/home'
+import request from '@/utils/request'
 
 const App = hot(function() {
   return (
-    <Router>
-      <Route path="/" component={Home} />
-    </Router>
+    <SWRConfig value={{
+      fetcher: request
+    }}>
+      <Router>
+        <Route path="/" component={Home} />
+      </Router>
+    </SWRConfig>
   )
 })
 
