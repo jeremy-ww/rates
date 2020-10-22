@@ -5,6 +5,8 @@ import ReactDOM from 'react-dom'
 import { SWRConfig } from 'swr'
 import React from 'react'
 
+import 'antd/dist/antd.css'
+
 import Home from '@/pages/home'
 import request from '@/utils/request'
 

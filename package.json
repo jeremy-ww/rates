@@ -6,11 +6,19 @@
     "lint:fix": "eslint --fix --ext .ts,.tsx,.js src"
   },
   "dependencies": {
+    "@types/query-string": "5",
+    "antd": "^4.7.2",
+    "axios": "^0.20.0",
+    "bootstrap": "^4.5.3",
     "core-js": "^3.6.4",
+    "dayjs": "^1.9.3",
     "immer": "^6.0.2",
     "patch-package": "^6.2.1",
     "postinstall-postinstall": "^2.0.0",
+    "query-string": "5",
+    "react-bootstrap": "^1.4.0",
     "react-use": "^13.27.0",
+    "swr": "^0.3.6",
     "workbox-window": "^5.0.0"
   },
   "devDependencies": {
