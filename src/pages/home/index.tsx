@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useCallback } from 'react'
 import { Table, Select, Form, Modal } from 'antd'
+import Trend from 'react-trend';
 import { TableProps } from 'antd/lib/table'
 import qs from 'query-string'
 import useSWR from 'swr'
@@ -14,7 +15,7 @@ const { start_at, end_at } = getPast30Days()
 const DEFAULT_SELECTED_CURRENCY = { symbol: '', rate: 0 }
 
 export default function Home() {
-  const [defaultCurrency, setDefaultCurrency] = React.useState('EUR')
+  const [defaultCurrency, setDefaultCurrency] = useState('EUR')
   const [selectedCurreny, setSelectedCurreny] = useState(DEFAULT_SELECTED_CURRENCY)
   const [form] = Form.useForm()
 
@@ -24,7 +25,9 @@ export default function Home() {
     base: defaultCurrency
   }))
 
-  const dateRange = data?.rates ? Object.keys(data?.rates).sort().reverse() : new Array(30).fill(null)
+  const dateRange = data?.rates
+    ? Object.keys(data?.rates).sort().reverse()
+    : new Array(30).fill(null)
 
   const columns: TableProps<any>['columns'] = useMemo(() => {
     return [
@@ -38,20 +41,22 @@ export default function Home() {
       {
         key: 'chart',
         title: 'Chart',
-        width: 100,
+        width: 150,
+        height: 60,
         fixed: 'left',
-        render () {
+        render (text, record) {
+          if (!data?.rates) return null
           return (
-            111
+            <Trend padding={0} height={60} smooth data={dateRange.map(v => record[v])} />
           )
         }
       },
       ...(dateRange.map(key => ({ key, width: 100, title: key, dataIndex: key })))
     ]
-  }, [data, dateRange])
+  }, [data, data?.rates, dateRange])
 
-  const data2 = useMemo(() => {
-    return CURRENCIES.map(currency => {
+  const tableSource = useMemo(() => {
+    return CURRENCIES.filter(v => v !== defaultCurrency).map(currency => {
       return {
         key: currency,
         currency,
@@ -87,7 +92,7 @@ export default function Home() {
             })
           }
         }
-      }} columns={columns} scroll={{ x: 'max-content' }} dataSource={data2} pagination={false} sticky />
+      }} columns={columns} scroll={{ x: 'max-content' }} dataSource={tableSource} pagination={false} sticky />
 
       <Modal
         onOk={onConversionModalClosed}
