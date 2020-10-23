@@ -77,7 +77,7 @@ export default connector(function Home(
         dataIndex: key
       }))
     ]
-  }, [data, data?.rates, dateRange])
+  }, [data, dateRange])
 
   const tableSource = useMemo(() => {
     return props.currencies

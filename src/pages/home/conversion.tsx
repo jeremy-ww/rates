@@ -18,7 +18,7 @@ export default function Conversion(props: { rate: number; symbol: string }) {
         })
       }
     },
-    [props.rate]
+    [form, props.rate]
   )
 
   const children = [

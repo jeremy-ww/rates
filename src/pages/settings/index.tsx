@@ -23,10 +23,13 @@ export default connector(function Settings(
 ) {
   const [form] = Form.useForm()
   const history = useHistory()
-  const onFinish = useCallback(values => {
-    props.dispatch({ type: 'ALTER', state: values })
-    history.push('/')
-  }, [])
+  const onFinish = useCallback(
+    values => {
+      props.dispatch({ type: 'ALTER', state: values })
+      history.push('/')
+    },
+    [history, props]
+  )
   return (
     <Form
       onFinish={onFinish}
