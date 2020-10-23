@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useCallback } from 'react'
 import { Table, Modal } from 'antd'
 import Trend from 'react-trend'
-import { connect, ConnectedProps, useSelector } from 'react-redux'
+import { connect, ConnectedProps } from 'react-redux'
 import { TableProps } from 'antd/lib/table'
 import qs from 'query-string'
 import useSWR from 'swr'
