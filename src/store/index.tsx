@@ -1,15 +1,25 @@
-export const initialState = { user: 'useHooks' }
+import { createStore } from 'redux'
 
-export enum Type {
-  SET_USER
+import { CURRENCIES } from '@/constants'
+
+export const initialSettings = {
+  source: 'EUR',
+  period: 10,
+  currencies: CURRENCIES
 }
 
-export function reducer(
-  state: typeof initialState,
-  action: { type: Type; payload: typeof initialState }
+function setSettings(
+  state = initialSettings,
+  action: { type: 'ALTER'; state: Partial<typeof initialSettings> }
 ) {
   switch (action.type) {
-    case Type['SET_USER']:
-      return { user: action.payload.user }
+    case 'ALTER':
+      return { ...state, ...action.state }
+    default:
+      return state
   }
 }
+
+export type SettingsStore = typeof initialSettings
+
+export default createStore(setSettings)
