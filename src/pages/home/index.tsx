@@ -1,24 +1,30 @@
-import React, { useMemo } from 'react'
-import { Table, Select, Form } from 'antd'
+import React, { useMemo, useState, useCallback } from 'react'
+import { Table, Select, Form, Modal } from 'antd'
 import { TableProps } from 'antd/lib/table'
 import qs from 'query-string'
 import useSWR from 'swr'
 
 import { getPast30Days } from '@/utils/date'
+import { CURRENCIES } from '@/constants'
+import Conversion from './conversion'
 import './index.scss'
 
-const currencies = ["CAD", "HKD", "ISK", "PHP", "DKK", "HUF", "CZK", "GBP", "RON", "SEK", "IDR", "INR", "BRL", "RUB", "HRK", "JPY", "THB", "CHF", "EUR", "MYR", "BGN", "TRY", "CNY", "NOK", "NZD", "ZAR", "USD", "MXN", "SGD", "AUD", "ILS", "KRW", "PLN"]
+const { start_at, end_at } = getPast30Days()
+
+const DEFAULT_SELECTED_CURRENCY = { symbol: '', rate: 0 }
 
 export default function Home() {
-  const [defaultCurrency, setDefaultCurrency] =  React.useState('USD')
+  const [defaultCurrency, setDefaultCurrency] = React.useState('EUR')
+  const [selectedCurreny, setSelectedCurreny] = useState(DEFAULT_SELECTED_CURRENCY)
   const [form] = Form.useForm()
 
   const { data } = useSWR<Rates>('/history?' + qs.stringify({
-    ...getPast30Days(),
+    start_at,
+    end_at,
     base: defaultCurrency
   }))
 
-  const dateRange = Object.keys(data?.rates || {})
+  const dateRange = data?.rates ? Object.keys(data?.rates).sort().reverse() : new Array(30).fill(null)
 
   const columns: TableProps<any>['columns'] = useMemo(() => {
     return [
@@ -26,14 +32,26 @@ export default function Home() {
         key: 'currency',
         title: 'Currency',
         dataIndex: 'currency',
-        fixed: 'left'
+        width: 95,
+        fixed: 'left',
       },
-      ...(dateRange.map(key => ({ key, title: key, dataIndex: key })))
+      {
+        key: 'chart',
+        title: 'Chart',
+        width: 100,
+        fixed: 'left',
+        render () {
+          return (
+            111
+          )
+        }
+      },
+      ...(dateRange.map(key => ({ key, width: 100, title: key, dataIndex: key })))
     ]
   }, [data, dateRange])
 
   const data2 = useMemo(() => {
-    return currencies.map(currency => {
+    return CURRENCIES.map(currency => {
       return {
         key: currency,
         currency,
@@ -43,25 +61,42 @@ export default function Home() {
       }
     })
   }, [data?.rates])
+
+  const onConversionModalClosed =  useCallback(() => {
+    setSelectedCurreny(DEFAULT_SELECTED_CURRENCY)
+  }, [])
+
   return (
     <div className="home">
       <Form initialValues={{ source: defaultCurrency }} form={form} onValuesChange={(changedValues, allValues) => {
         setDefaultCurrency(allValues.source)
       }}>
-        <Form.Item name="source" label="Sources">
+        <Form.Item name="source" label="Source">
           <Select showSearch style={{ width: 100 }}>
-            {currencies.map(currency => <Select.Option key={currency} value={currency}>{currency}</Select.Option>)}
+            {CURRENCIES.map(currency => <Select.Option key={currency} value={currency}>{currency}</Select.Option>)}
           </Select>
         </Form.Item>
       </Form>
 
-      <Table onRow={(record: Record<string, string> & { currency: string }) => {
+      <Table onRow={(record: Record<string, string | number> & { currency: string }) => {
         return {
-          onClick: event => {
-            
+          onClick: () => {
+            setSelectedCurreny({
+              symbol: record.currency,
+              rate: record[dateRange[0]] as number
+            })
           }
         }
-      }} columns={columns} dataSource={data2} pagination={false} />
+      }} columns={columns} scroll={{ x: 'max-content' }} dataSource={data2} pagination={false} sticky />
+
+      <Modal
+        onOk={onConversionModalClosed}
+        onCancel={onConversionModalClosed}
+        title="Conversion"
+        visible={Boolean(selectedCurreny.symbol)}
+        destroyOnClose>
+          <Conversion symbol={selectedCurreny.symbol} rate={selectedCurreny.rate} />
+      </Modal>
     </div>
   )
 }
