@@ -1,5 +1,9 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { Form, Select, Button } from 'antd'
+
+import { CURRENCIES } from '@/constants'
+import { initialSettings } from '@/store'
+import './index.scss'
 
 const layout = {
   labelCol: { span: 8 },
@@ -10,17 +14,13 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
-const currencies = ["CAD", "HKD", "ISK", "PHP", "DKK", "HUF", "CZK", "GBP", "RON", "SEK", "IDR", "INR", "BRL", "RUB", "HRK", "JPY", "THB", "CHF", "EUR", "MYR", "BGN", "TRY", "CNY", "NOK", "NZD", "ZAR", "USD", "MXN", "SGD", "AUD", "ILS", "KRW", "PLN"]
-
 export default function Settings () {
   const [form] = Form.useForm()
   return (
-    <Form {...layout} initialValues={{ source: 'EUR' }} form={form} onValuesChange={(changedValues, allValues) => {
-      console.log(allValues)
-    }}>
+    <Form className="settings" {...layout} initialValues={initialSettings} form={form}>
       <Form.Item name="source" label="Current Source">
         <Select showSearch>
-          {currencies.map(currency => <Select.Option key={currency} value={currency}>{currency}</Select.Option>)}
+          {CURRENCIES.map(currency => <Select.Option key={currency} value={currency}>{currency}</Select.Option>)}
         </Select>
       </Form.Item>
 
@@ -32,7 +32,7 @@ export default function Settings () {
 
       <Form.Item name="currencies" label="Currencies">
         <Select mode="multiple" showSearch>
-          {currencies.map(v => <Select.Option key={v} value={v}>{v}</Select.Option>)}
+          {CURRENCIES.map(v => <Select.Option key={v} value={v}>{v}</Select.Option>)}
         </Select>
       </Form.Item>
 
