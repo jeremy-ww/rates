@@ -13,13 +13,12 @@ import ReactDOM from 'react-dom'
 import { SWRConfig } from 'swr'
 import { Menu } from 'antd'
 
-import 'antd/dist/antd.css'
-
 const Home = lazy(() => import('@/pages/home'))
 const Settings = lazy(() => import('@/pages/settings'))
 
 import store from '@/store'
 import request from '@/utils/request'
+import './index.scss'
 
 function Header() {
   const location = useLocation()
@@ -53,11 +52,12 @@ const App = hot(function() {
     <Router>
       <Header />
 
-      <main style={{ padding: 40 }}>
+      <main>
         <Suspense fallback={<div>loading...</div>}>
           <Provider store={store}>
             <SWRConfig
               value={{
+                refreshInterval: 0,
                 fetcher: request
               }}
             >
