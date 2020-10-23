@@ -1,6 +1,12 @@
-import { BrowserRouter as Router, Route, useLocation, useHistory } from 'react-router-dom'
-import { HomeOutlined, SettingOutlined } from '@ant-design/icons';
-import React, { useCallback } from 'react'
+import {
+  BrowserRouter as Router,
+  Route,
+  useLocation,
+  useHistory
+} from 'react-router-dom'
+import { HomeOutlined, SettingOutlined } from '@ant-design/icons'
+import { Provider } from 'react-redux'
+import React, { useCallback, Suspense, lazy } from 'react'
 import { hot } from 'react-hot-loader/root'
 import { Workbox } from 'workbox-window'
 import ReactDOM from 'react-dom'
@@ -9,20 +15,29 @@ import { Menu } from 'antd'
 
 import 'antd/dist/antd.css'
 
-import Home from '@/pages/home'
-import Settings from '@/pages/settings'
+const Home = lazy(() => import('@/pages/home'))
+const Settings = lazy(() => import('@/pages/settings'))
+
+import store from '@/store'
 import request from '@/utils/request'
 
-function Header () {
+function Header() {
   const location = useLocation()
   const history = useHistory()
 
-  const onMenuClick = useCallback(e => {
-    history.push(e.key)
-  }, [history])
+  const onMenuClick = useCallback(
+    e => {
+      history.push(e.key)
+    },
+    [history]
+  )
 
   return (
-    <Menu onClick={onMenuClick} selectedKeys={[location.pathname]} mode="horizontal">
+    <Menu
+      onClick={onMenuClick}
+      selectedKeys={[location.pathname]}
+      mode="horizontal"
+    >
       <Menu.Item key="/" icon={<HomeOutlined />}>
         Home
       </Menu.Item>
@@ -35,18 +50,24 @@ function Header () {
 
 const App = hot(function() {
   return (
-    <SWRConfig value={{
-      fetcher: request
-    }}>
-      <Router>
-        <Header />
+    <Router>
+      <Header />
 
-        <main style={{ padding: 40 }}>
-          <Route path="/" exact component={Home} />
-          <Route path="/settings" component={Settings} />
-        </main>
-      </Router>
-    </SWRConfig>
+      <main style={{ padding: 40 }}>
+        <Suspense fallback={<div>loading...</div>}>
+          <Provider store={store}>
+            <SWRConfig
+              value={{
+                fetcher: request
+              }}
+            >
+              <Route path="/" exact component={Home} />
+            </SWRConfig>
+            <Route path="/settings" component={Settings} />
+          </Provider>
+        </Suspense>
+      </main>
+    </Router>
   )
 })
 
