@@ -1,16 +1,37 @@
-import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Route, useLocation, useHistory } from 'react-router-dom'
+import { HomeOutlined, SettingOutlined } from '@ant-design/icons';
+import React, { useCallback } from 'react'
 import { hot } from 'react-hot-loader/root'
 import { Workbox } from 'workbox-window'
 import ReactDOM from 'react-dom'
 import { SWRConfig } from 'swr'
-import React from 'react'
-
 import { Menu } from 'antd'
 
 import 'antd/dist/antd.css'
 
 import Home from '@/pages/home'
+import Settings from '@/pages/settings'
 import request from '@/utils/request'
+
+function Header () {
+  const location = useLocation()
+  const history = useHistory()
+
+  const onMenuClick = useCallback(e => {
+    history.push(e.key)
+  }, [history])
+
+  return (
+    <Menu onClick={onMenuClick} selectedKeys={[location.pathname]} mode="horizontal">
+      <Menu.Item key="/" icon={<HomeOutlined />}>
+        Home
+      </Menu.Item>
+      <Menu.Item key="/settings" icon={<SettingOutlined />}>
+        Settings
+      </Menu.Item>
+    </Menu>
+  )
+}
 
 const App = hot(function() {
   return (
@@ -18,17 +39,12 @@ const App = hot(function() {
       fetcher: request
     }}>
       <Router>
-        <Menu selectedKeys={['home']} mode="horizontal">
-          <Menu.Item key="home">
-            Home
-          </Menu.Item>
-          <Menu.Item key="settings">
-            Settings
-          </Menu.Item>
-        </Menu>
+        <Header />
 
-        <Route path="/" component={Home} />
-        <Route path="/settings" component={Home} />
+        <main style={{ padding: 40 }}>
+          <Route path="/" exact component={Home} />
+          <Route path="/settings" component={Settings} />
+        </main>
       </Router>
     </SWRConfig>
   )
