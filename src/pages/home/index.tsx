@@ -1,15 +1,14 @@
 import React, { useMemo, useState, useCallback } from 'react'
-import { Table, Select, Form, Modal } from 'antd'
+import { Table, Modal } from 'antd'
 import Trend from 'react-trend'
-import { connect } from 'react-redux'
+import { connect, ConnectedProps, useSelector } from 'react-redux'
 import { TableProps } from 'antd/lib/table'
 import qs from 'query-string'
 import useSWR from 'swr'
 
-import { SettingsStore } from '@/store'
+import { RootState } from '@/store'
 import random from '@/utils/random'
 import { getPast30Days } from '@/utils/date'
-import { CURRENCIES } from '@/constants'
 import Conversion from './conversion'
 import './index.scss'
 
@@ -17,14 +16,15 @@ const { start_at, end_at } = getPast30Days()
 
 const DEFAULT_SELECTED_CURRENCY = { symbol: '', rate: 0 }
 
-export default connect(state => state)(function Home(
-  props: SettingsStore & any
+const connector = connect((state: RootState) => state.settings)
+
+export default connector(function Home(
+  props: ConnectedProps<typeof connector>
 ) {
   const defaultCurrency = props.source
   const [selectedCurreny, setSelectedCurreny] = useState(
     DEFAULT_SELECTED_CURRENCY
   )
-  const [form] = Form.useForm()
 
   const { data } = useSWR<Rates>(
     '/history?' +
@@ -33,7 +33,7 @@ export default connect(state => state)(function Home(
         end_at,
         base: defaultCurrency
       }),
-    { refreshInterval: props.period, suspense: true }
+    { refreshInterval: props.period * 1000, suspense: true }
   )
 
   const dateRange = data?.rates
@@ -57,6 +57,7 @@ export default connect(state => state)(function Home(
         width: 150,
         height: 60,
         fixed: 'left',
+        responsive: ['lg'],
         render(text, record) {
           if (!data?.rates) return null
           return (
@@ -100,27 +101,6 @@ export default connect(state => state)(function Home(
 
   return (
     <div className="home">
-      <Form
-        initialValues={{ source: defaultCurrency }}
-        form={form}
-        onValuesChange={(changedValues, allValues) => {
-          props.dispatch({
-            type: 'ALTER',
-            state: { source: allValues.source }
-          })
-        }}
-      >
-        <Form.Item name="source" label="Source">
-          <Select showSearch style={{ width: 100 }}>
-            {CURRENCIES.map(currency => (
-              <Select.Option key={currency} value={currency}>
-                {currency}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-      </Form>
-
       <Table
         onRow={(
           record: Record<string, string | number> & { currency: string }

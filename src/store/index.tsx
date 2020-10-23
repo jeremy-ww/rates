@@ -1,25 +1,11 @@
-import { createStore } from 'redux'
+import { createStore, combineReducers } from 'redux'
 
-import { CURRENCIES } from '@/constants'
+import settings from './settings'
 
-export const initialSettings = {
-  source: 'EUR',
-  period: 10,
-  currencies: CURRENCIES
-}
+const rootReducer = combineReducers({
+  settings
+})
 
-function setSettings(
-  state = initialSettings,
-  action: { type: 'ALTER'; state: Partial<typeof initialSettings> }
-) {
-  switch (action.type) {
-    case 'ALTER':
-      return { ...state, ...action.state }
-    default:
-      return state
-  }
-}
+export type RootState = ReturnType<typeof rootReducer>
 
-export type SettingsStore = typeof initialSettings
-
-export default createStore(setSettings)
+export default createStore(rootReducer)
